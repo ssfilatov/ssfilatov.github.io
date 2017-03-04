@@ -3,10 +3,11 @@
 Since async/await keywords were introduced in python there were a lot of talks about them, so I decided to hop into.
 This page contains thoughts on making [Openstack Horizon](https://github.com/openstack/horizon) faster by making it work with async requests.
 
-### Horizon Imitation
+### Sync Horizon Imitation
 
 For testing purposes I took code responsible for rendering **instances** page:
-```
+
+```python
 def get_data(self):
     instances = []
     marker = self.request.GET.get(
@@ -49,8 +50,9 @@ def get_data(self):
                           _('Unable to retrieve instances.'))
 ```                              
 
-Basically Horizon does not support python 3 so I rewrote and simplified it(**a lot!**):
-```
+I wanted to make sync and async code more or less similar(and Openstack Horizon does not support python 3), so I rewrote and simplified(**a lot!**) *get_data* function:
+
+```python
 def build_novaclient(auth_token):
     return nova_client.Client('2.1',
                            USERNAME,
@@ -94,3 +96,55 @@ def get_data():
 
     return servers, images, flavors
 ```
+
+### Async Horizon Imitation
+
+First, we need to set App object from **aiohttp** lib:
+```python
+loop = uvloop.new_event_loop()
+app = web.Application(loop=loop)
+app.router.add_route("GET", "/", hello)
+web.run_app(app, port=80)
+```
+
+To make coroutines work, we need to create asynchronous http requests. Openstack clients that we used above do not work for us. I used **aiohttp.ClientSession** lib:
+
+```python
+async def list_servers(auth_token):
+
+    url = "NOVA_URL%s" % ("/servers/detail")
+    headers = {'content-type': 'application/json', 
+        'X-Auth-Token': auth_token}
+    async with ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            response = await response.json()
+            return [s['name'] for s in response['servers']]
+```
+
+We need to attach our couroutines to the main loop and gather them all in our routing function:
+
+```python
+async def hello(request):
+    auth_token = get_auth_token()
+    await asyncio.gather(
+        list_flavors(auth_token),
+        list_servers(auth_token),
+        list_images(auth_token),
+        list_networks(auth_token),
+        list_ports(auth_token),
+        list_fips(auth_token)
+    )
+    #response = web.Response(body="Servers: {}\nImages: 
+    #    {}\nFlavors: {}\n".format(servers, images, flavors).encode())
+    response = web.Response(body="Getrekt".encode())
+    return response
+```
+
+### Benchmarks
+
+*TO DO in non-ha mode*
+
+Average time in sync mode:
+**4.86 sec** per request
+Average time in async mode:
+**2.15 sec** per request
