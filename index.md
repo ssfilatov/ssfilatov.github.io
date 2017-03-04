@@ -145,19 +145,33 @@ async def hello(request):
 Permormed on empty non-HA mode OpenStack locally
 
 ApacheBenchmarks:
+
 Async code:
+
 on 1000 requests:
+
 **136.943ms** mean per request concurrency level 5
+
 **133.077ms** mean per request concurrency level 20
+
 **139.070ms** mean per request concurrency level 100
+
 Sync code:
+
 on 1000 requests:
+
 **461.749ms** mean per request concurrency level 5
+
 *My terrible code crushes with concurrency level more than 5*
+
 
 Performed over vpn on stacked HA mode OpenStack:
 
 Average time in sync mode:
+
 **4.86 sec** per request
+
 Average time in async mode:
+
 **2.15 sec** per request
+
