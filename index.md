@@ -101,10 +101,10 @@ def get_data():
 
 First, we need to set App object from **aiohttp** lib:
 ```python
-loop = uvloop.new_event_loop()
-app = web.Application(loop=loop)
-app.router.add_route("GET", "/", hello)
-web.run_app(app, port=80)
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+app = web.Application()
+app.router.add_route("GET", "/", get_data)
+web.run_app(app, port=8080)
 ```
 
 To make coroutines work, we need to create asynchronous http requests. Openstack clients that we used above do not work for us. I used **aiohttp.ClientSession** lib:
@@ -124,19 +124,18 @@ async def list_servers(auth_token):
 We need to attach our couroutines to the main loop and gather them all in our routing function:
 
 ```python
-async def hello(request):
+async def get_data(request):
     auth_token = get_auth_token()
-    await asyncio.gather(
+    res_list = await asyncio.gather(
         list_flavors(auth_token),
         list_servers(auth_token),
         list_images(auth_token),
         list_networks(auth_token),
         list_ports(auth_token),
-        list_fips(auth_token)
+        list_fips(auth_token),
     )
-    #response = web.Response(body="Servers: {}\nImages: 
-    #    {}\nFlavors: {}\n".format(servers, images, flavors).encode())
-    response = web.Response(body="Getrekt".encode())
+    response = web.Response(body="\n".join(
+        [str(x) for x in res_list]).encode())
     return response
 ```
 
@@ -146,24 +145,39 @@ Permormed on empty non-HA mode OpenStack locally
 
 ApacheBenchmarks:
 
-Async code:
+##### Async code:
+
+on 100 requests:
+
+**142.543ms** mean per request concurrency level 5
+
+**144.334ms** mean per request concurrency level 20
 
 on 1000 requests:
 
-**136.943ms** mean per request concurrency level 5
+**141.432ms** mean per request concurrency level 100
 
-**133.077ms** mean per request concurrency level 20
+##### Sync code:
 
-**139.070ms** mean per request concurrency level 100
+on 100 requests:
 
-Sync code:
-
-on 1000 requests:
-
-**461.749ms** mean per request concurrency level 5
+**559.749ms** mean per request concurrency level 5
 
 *My terrible code crushes with concurrency level more than 5*
 
+##### Sanic code
+
+on 100 requests:
+
+**150.435ms** mean per request concurrency level 5
+
+**136.909ms** mean per request concurrency level 20
+
+on 1000 requests:
+
+**140.570ms** mean per request concurrency level 100
+
+### ToDO
 
 Performed over vpn on stacked HA mode OpenStack:
 
