@@ -9,7 +9,7 @@ Python 3.4 introduced brand new async library - **asyncio** and that's awesome!
 
 * In some cases asynchronous code will improve your application vastly.
 
-If you are new to async features in python - here's good article https://snarky.ca/how-the-heck-does-async-await-work-in-python-3-5/
+If you are new to async features in python - here's good article [How the heck does async await work in python3.5](https://snarky.ca/how-the-heck-does-async-await-work-in-python-3-5/)
 
 This page contains thoughts on making [Openstack Horizon](https://github.com/openstack/horizon) faster by making it work with async requests.
 
