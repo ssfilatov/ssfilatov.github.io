@@ -155,37 +155,14 @@ Permormed on empty non-HA mode OpenStack locally
 
 ApacheBenchmarks:
 
-##### Async code:
+| Concurrency level   |      Sync code     |  Async code   |  Sanic code |
+|---------------------|:------------------:|--------------:|------------:|
+|          5          |      559.749ms     |    142.543ms  |  150.435ms  |
+|          20         |          *         |    144.334ms  |  136.909ms  |
+|          100        |          *         |    141.432ms  |  140.570ms  |
 
-on 100 requests:
-
-**142.543ms** mean per request concurrency level 5
-
-**144.334ms** mean per request concurrency level 20
-
-on 1000 requests:
-
-**141.432ms** mean per request concurrency level 100
-
-##### Sync code:
-
-on 100 requests:
-
-**559.749ms** mean per request concurrency level 5
 
 *My terrible code crushes with concurrency level more than 5*
-
-##### Sanic code
-
-on 100 requests:
-
-**150.435ms** mean per request concurrency level 5
-
-**136.909ms** mean per request concurrency level 20
-
-on 1000 requests:
-
-**140.570ms** mean per request concurrency level 100
 
 ### ToDO
 
