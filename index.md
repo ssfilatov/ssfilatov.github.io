@@ -1,6 +1,16 @@
 ## Async Python in Openstack Horizon
 
-Since async/await keywords were introduced in python there were a lot of talks about them, so I decided to hop into.
+##### Brief intro
+Python 3.4 introduced brand new async library - **asyncio** and that's awesome!
+
+* Python's GIL doesn't let us use benefits of multicore processor - threads are not as effective as they could be.
+
+* Switching context consumes more resources in threads than in coroutines.
+
+* In some cases asynchronous code will improve your application vastly.
+
+If you are new to async features in python - here's good article https://snarky.ca/how-the-heck-does-async-await-work-in-python-3-5/
+
 This page contains thoughts on making [Openstack Horizon](https://github.com/openstack/horizon) faster by making it work with async requests.
 
 ### Sync Horizon Imitation
