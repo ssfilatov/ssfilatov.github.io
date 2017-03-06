@@ -155,11 +155,12 @@ Permormed on empty non-HA mode OpenStack locally
 
 ApacheBenchmarks:
 
-| Concurrency level   |      Sync code     |  Async code   |  Sanic code |
-|---------------------|:------------------:|--------------:|------------:|
-|          5          |      559.749ms     |    142.543ms  |  150.435ms  |
-|          20         |          *         |    144.334ms  |  136.909ms  |
-|          100        |          *         |    141.432ms  |  140.570ms  |
+| Concurrency level   |  Sync code w clients  |  Sync code w raw requests  |  Async code   |  Sanic code |
+|---------------------|:---------------------:| --------------------------:|--------------:|------------:|
+|          1          |        749.555ms      |          490.616ms         |    284.802ms  |  301.400ms  |
+|          5          |        539.035ms      |          457.420ms         |    239.781ms  |  204.123ms  |
+|          10         |            *          |              *             |    216.315ms  |  176.590ms  |
+|          100        |            *          |              *             |    211.884ms  |  170.570ms  |
 
 
 *My terrible code crushes with concurrency level more than 5*
